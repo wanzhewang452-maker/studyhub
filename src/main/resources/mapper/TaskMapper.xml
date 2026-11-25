@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.studyhub.mapper.TaskMapper">
+    <select id="page" resultType="com.studyhub.vo.TaskVO">
+        SELECT id, title, done, created_at, updated_at
+        FROM studyhub.tasks
+        WHERE user_id = #{userId}
+        <if test="done != null">
+            AND done = #{done}
+        </if>
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        ORDER BY id DESC
+    </select>
+</mapper>
