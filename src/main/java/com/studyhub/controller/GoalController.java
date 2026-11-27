@@ -22,7 +22,7 @@ public class GoalController {
     @Autowired
     private GoalService goalService;// Changed from private GoalServiceImpl goalService;
     @PostMapping
-    public Result createGoal(@Valid @RequestBody GoalCreateDTO goalCreateDTO,@AuthenticationPrincipal Integer currentUserId) {
+    public Result<Integer> createGoal(@Valid @RequestBody GoalCreateDTO goalCreateDTO,@AuthenticationPrincipal Integer currentUserId) {
         int goalId = goalService.createGoal(goalCreateDTO, currentUserId);
         return Result.success(goalId);
     }

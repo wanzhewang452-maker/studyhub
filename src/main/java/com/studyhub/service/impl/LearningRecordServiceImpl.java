@@ -28,6 +28,53 @@ public class LearningRecordServiceImpl
     private GoalMapper goalMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteLearningRecord(Integer userId, Integer recordId) {
+
+        // 1. 校验用户身份
+        if (userId == null) {
+            throw new BusinessException(401, "用户未登录");
+        }
+
+        // 2. 校验记录ID
+        if (recordId == null || recordId <= 0) {
+            throw new BusinessException(400, "记录ID不合法");
+        }
+
+        // 3. 查询学习记录，同时校验用户归属
+        LearningRecord record =
+                learningRecordMapper.getLearningRecordById(
+                        userId, recordId
+                );
+
+        if (record == null) {
+            throw new BusinessException(404, "学习记录不存在");
+        }
+
+        // 4. 删除学习记录
+        int rows = learningRecordMapper.deleteRecord(userId, recordId);
+
+        // 关键修改：必须确认本次请求真正删除了记录
+        if (rows != 1) {
+            throw new BusinessException(404, "学习记录不存在或已删除");
+        }
+
+        // 5. 扣减目标完成时长
+        int goalRows = goalMapper.decreaseCompletedMinutes(
+                userId,
+                record.getGoalId(),
+                record.getDurationMinutes()
+        );
+
+        // 6. 检查扣减结果，失败则回滚删除操作
+        if (goalRows != 1) {
+            throw new BusinessException(500, "扣减学习时长失败");
+        }
+
+        return rows;
+    }
+
+    @Override
     public PageBean<LearningRecord> getLearningRecordPage(Integer userId, LearningRecordPageQueryDTO learningRecordPageQueryDTO) {
         if (userId == null){
             throw new BusinessException(401, "用户未登录");

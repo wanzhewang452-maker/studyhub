@@ -28,4 +28,17 @@ public interface GoalMapper {
             @Param("userId") Integer userId,
             @Param("durationMinutes") Integer durationMinutes
     );
+    @Update("""
+    UPDATE studyhub.goals
+    SET completed_minutes = completed_minutes - #{durationMinutes},
+        updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = #{userId}
+      AND id = #{goalId}
+      AND completed_minutes >= #{durationMinutes}
+    """)
+    int decreaseCompletedMinutes(
+            @Param("userId") Integer userId,
+            @Param("goalId") Integer goalId,
+            @Param("durationMinutes") Integer durationMinutes
+    );
 }

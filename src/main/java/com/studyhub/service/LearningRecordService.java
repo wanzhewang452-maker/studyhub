@@ -14,4 +14,6 @@ public interface LearningRecordService {
     );
 
     PageBean<LearningRecord> getLearningRecordPage(Integer userId, @Valid LearningRecordPageQueryDTO learningRecordPageQueryDTO);
+
+    int deleteLearningRecord(Integer userId, Integer recordId);
 }

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.studyhub.mapper.StatisticsMapper">
+
+
+    <select id="getStatisticsOverview"
+            resultType="com.studyhub.vo.StatisticsOverviewVO">
+
+        SELECT
+
+        <!-- 累计学习时长 -->
+        (
+        SELECT COALESCE(SUM(lr.duration_minutes), 0)
+        FROM studyhub.learning_records lr
+        JOIN studyhub.goals g ON lr.goal_id = g.id
+        WHERE g.user_id = #{userId}
+        ) AS totalStudyMinutes,
+
+        <!-- 学习记录总数 -->
+        (
+        SELECT COUNT(lr.id)
+        FROM studyhub.learning_records lr
+        JOIN studyhub.goals g ON lr.goal_id = g.id
+        WHERE g.user_id = #{userId}
+        ) AS totalRecordCount,
+
+        <!-- 学习目标总数 -->
+        (
+        SELECT COUNT(g.id)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ) AS totalGoalCount,
+
+        <!-- 已完成目标数 -->
+        (
+        SELECT COUNT(g.id)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        AND g.completed_minutes >= g.target_minutes
+        ) AS completedGoalCount,
+
+        <!-- 总计划学习时长 -->
+        (
+        SELECT COALESCE(SUM(g.target_minutes), 0)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ) AS totalTargetMinutes,
+
+        <!-- 总完成学习时长 -->
+        (
+        SELECT COALESCE(SUM(g.completed_minutes), 0)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ) AS totalCompletedMinutes,
+
+        <!-- 总体完成率 -->
+        CASE
+        WHEN (
+        SELECT COALESCE(SUM(g.target_minutes), 0)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ) = 0 THEN 0
+        ELSE ROUND(
+        (
+        SELECT COALESCE(SUM(g.completed_minutes), 0)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ) * 100.0 /
+        (
+        SELECT SUM(g.target_minutes)
+        FROM studyhub.goals g
+        WHERE g.user_id = #{userId}
+        ), 2
+        )
+        END AS overallProgress
+
+    </select>
+
+</mapper>
