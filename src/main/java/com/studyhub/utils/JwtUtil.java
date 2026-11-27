@@ -31,13 +31,13 @@ public class JwtUtil {
 
         Date now = new Date();
 
-        return Jwts.builder()
-                .subject(userId.toString())
-                .claim("username", username)
-                .issuedAt(now)
-                .expiration(new Date(now.getTime() + expiration))
-                .signWith(key, Jwts.SIG.HS256)
-                .compact();
+        return Jwts.builder()   //建造者模式
+                .subject(userId.toString()) //设置主题，存放用户的唯一标识
+                .claim("username", username) //自定义声明，解析时可以直接读取这个声明
+                .issuedAt(now)   //签发时间
+                .expiration(new Date(now.getTime() + expiration))   //过期时间
+                .signWith(key, Jwts.SIG.HS256)   //签名算法
+                .compact();  //压缩为JWT字符串
     }
 
     // 验证并解析 JWT

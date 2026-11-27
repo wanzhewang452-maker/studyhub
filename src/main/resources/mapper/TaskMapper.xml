@@ -14,4 +14,28 @@
         </if>
         ORDER BY id DESC
     </select>
+    <update id="updateTask">
+        UPDATE tasks
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="done != null">
+                done = #{done},
+            </if>
+            updated_at = #{updatedAt}
+        </set>
+        WHERE id = #{id}
+        AND user_id = #{userId}
+    </update>
+
+    <select id="countOwnedTask" resultType="int">
+        SELECT COUNT(*) FROM studyhub.tasks
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM studyhub.tasks
+        WHERE id = #{id} AND user_id = #{userId}
+    </delete>
 </mapper>

@@ -4,6 +4,7 @@ import com.studyhub.common.PageBean;
 import com.studyhub.common.Result;
 import com.studyhub.dto.TaskCreateDTO;
 import com.studyhub.dto.TaskPageQueryDTO;
+import com.studyhub.dto.TaskUpdateDTO;
 import com.studyhub.service.TaskService;
 import com.studyhub.vo.TaskVO;
 import jakarta.validation.Valid;
@@ -36,5 +37,22 @@ public class TaskController {
                                          @Valid @ModelAttribute TaskPageQueryDTO dto) {
 
         return Result.success(taskService.page(userId, dto));
+    }
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@AuthenticationPrincipal Integer userId,
+                               @PathVariable Integer id) {
+        taskService.delete(userId, id);
+        return Result.success();
+    }
+
+    @PutMapping("/{id}")
+    public Result<Void> updateTask(
+            @AuthenticationPrincipal Integer userId,
+            @PathVariable Integer id,
+            @Valid @RequestBody TaskUpdateDTO dto) {
+
+        log.info("更新学习任务，userId={}", userId);
+        taskService.updateTask(userId, id, dto);
+        return Result.success();
     }
 }

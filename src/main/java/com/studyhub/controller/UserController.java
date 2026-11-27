@@ -26,7 +26,7 @@ public class UserController {
     @PostMapping("/login")
     public Result<String> login(@Valid @RequestBody LoginDTO user) {
         log.info("用户登录");
-        String token = userService.login(user      );
+        String token = userService.login(user);
         return Result.success(token);
     }
     @GetMapping("/me/id")

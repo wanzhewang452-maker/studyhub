@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.studyhub.common.PageBean;
 import com.studyhub.dto.TaskCreateDTO;
 import com.studyhub.dto.TaskPageQueryDTO;
+import com.studyhub.dto.TaskUpdateDTO;
 import com.studyhub.entity.Task;
 import com.studyhub.exception.BusinessException;
 import com.studyhub.mapper.TaskMapper;
@@ -27,6 +28,51 @@ public class TaskServiceImpl implements TaskService {
         PageHelper.startPage(dto.getPage(), dto.getPageSize());
         Page<TaskVO> page = taskMapper.page(userId, dto.getDone(), dto.getTitle());
         return new PageBean<>(page.getResult(), page.getTotal());
+    }
+
+    @Override
+    public void updateTask(Integer userId, Integer id, TaskUpdateDTO dto) {
+        checkIdentityAndId(userId, id);
+        if (dto == null || !dto.isUpdatePresent() || !dto.isTitleValid()) {
+            throw new BusinessException(400, "请提供有效的任务标题或完成状态");
+        }
+        String title = dto.getTitle() == null ? null : dto.getTitle().trim();
+        Task task = new Task();
+
+        task.setId(id);
+        task.setUserId(userId);
+        task.setTitle(title);
+
+// 如果 Task 实体中的 done 是 Integer
+        task.setDone(
+                dto.getDone() == null
+                        ? null
+                        : (dto.getDone() ? 1 : 0)
+        );
+
+        int rows = taskMapper.updateTask(task);
+        // Some JDBC settings report zero for an unchanged row. Distinguish that
+        // from a missing task without exposing another user's task.
+        if (rows == 0 && taskMapper.countOwnedTask(userId, id) == 0) {
+            throw new BusinessException(404, "任务不存在");
+        }
+    }
+
+    @Override
+    public void delete(Integer userId, Integer id) {
+        checkIdentityAndId(userId, id);
+        if (taskMapper.delete(userId, id) == 0) {
+            throw new BusinessException(404, "任务不存在");
+        }
+    }
+
+    private void checkIdentityAndId(Integer userId, Integer id) {
+        if (userId == null) {
+            throw new BusinessException(401, "用户未登录");
+        }
+        if (id == null || id < 1) {
+            throw new BusinessException(400, "任务 ID 不合法");
+        }
     }
 
     @Override

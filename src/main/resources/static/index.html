@@ -1,1071 +1,148 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyHub - 学习管理系统</title>
-
-    <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
-            background: #f4f6fa;
-            color: #243047;
-        }
-
-        button, input, select { font: inherit; }
-        button { cursor: pointer; }
-
-        .hidden { display: none !important; }
-
-        header {
-            background: #17243a;
-            color: white;
-            padding: 17px 6%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 23px;
-            font-weight: 700;
-            letter-spacing: .5px;
-        }
-
-        .logo span { color: #65a8ff; }
-
-        .container {
-            max-width: 1100px;
-            margin: 35px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 3px 15px rgba(0,0,0,.035);
-        }
-
-        .login-box {
-            max-width: 430px;
-            margin: 90px auto;
-        }
-
-        h2 { margin-top: 0; }
-        .muted { color: #8b95a7; font-size: 13px; }
-
-        input, select {
-            width: 100%;
-            padding: 11px 13px;
-            border: 1px solid #dce2ec;
-            border-radius: 7px;
-            outline: none;
-            margin-top: 7px;
-            background: white;
-        }
-
-        input:focus, select:focus {
-            border-color: #4388ed;
-        }
-
-        .field { margin: 17px 0; }
-
-        label {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .btn {
-            border: 0;
-            padding: 10px 17px;
-            border-radius: 7px;
-            background: #377fe5;
-            color: white;
-        }
-
-        .btn:hover { background: #246bd0; }
-
-        .btn:disabled {
-            opacity: .55;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: #edf1f7;
-            color: #35445b;
-        }
-
-        .btn-danger {
-            background: #fff0ef;
-            color: #d34a42;
-        }
-
-        .btn-success { background: #199c70; }
-
-        .btn-small {
-            padding: 7px 11px;
-            font-size: 12px;
-        }
-
-        .full { width: 100%; }
-
-        .topline {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 17px;
-            margin: 25px 0;
-        }
-
-        .stat {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .stat strong {
-            display: block;
-            font-size: 29px;
-            margin-top: 10px;
-        }
-
-        .stat small { color: #8792a5; }
-        .blue { color: #377fe5; }
-        .green { color: #199c70; }
-        .orange { color: #e59a35; }
-
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-        }
-
-        .filter {
-            border: 1px solid #e0e5ed;
-            background: white;
-            border-radius: 7px;
-            padding: 8px 15px;
-            color: #536176;
-        }
-
-        .filter.active {
-            background: #eaf2ff;
-            color: #377fe5;
-            border-color: #c8dcff;
-        }
-
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 11px;
-        }
-
-        .task {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            border: 1px solid #e9edf3;
-            border-radius: 9px;
-            padding: 16px;
-            background: white;
-        }
-
-        .task-title {
-            flex: 1;
-            min-width: 0;
-            overflow-wrap: anywhere;
-            font-weight: 600;
-        }
-
-        .task-title.done {
-            text-decoration: line-through;
-            color: #a0a8b5;
-        }
-
-        .task-meta {
-            font-size: 12px;
-            color: #9aa3b1;
-            margin-top: 5px;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 7px;
-        }
-
-        .status {
-            font-size: 11px;
-            border-radius: 20px;
-            padding: 4px 9px;
-            background: #fff5e5;
-            color: #c78a26;
-        }
-
-        .status.done {
-            background: #e8f7f0;
-            color: #199c70;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 24px;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15,25,42,.48);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 10;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 430px;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 22px;
-        }
-
-        .notice {
-            padding: 12px 15px;
-            border-radius: 7px;
-            margin-bottom: 17px;
-            font-size: 13px;
-        }
-
-        .notice.error {
-            color: #bb4038;
-            background: #fff0ee;
-        }
-
-        .notice.info {
-            color: #326bb2;
-            background: #edf5ff;
-        }
-
-        .notice.success {
-            color: #16835f;
-            background: #e9f8f1;
-        }
-
-        .config {
-            margin-bottom: 18px;
-        }
-
-        .config summary {
-            cursor: pointer;
-            font-size: 13px;
-            color: #64738a;
-        }
-
-        .config-content {
-            display: flex;
-            align-items: end;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .config-content .field { flex: 1; margin: 0; }
-
-        .empty {
-            text-align: center;
-            color: #9aa3b1;
-            padding: 55px 10px;
-        }
-
-        footer {
-            text-align: center;
-            color: #a0a9b6;
-            padding: 30px;
-            font-size: 12px;
-        }
-
-        @media(max-width:650px) {
-            .stats { gap: 8px; }
-            .stat { padding: 13px; }
-            .stat strong { font-size: 23px; }
-            .task { flex-wrap: wrap; }
-            .task-actions { width: 100%; }
-            .task-actions button { flex: 1; }
-            .config-content { flex-direction: column; align-items: stretch; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StudyHub · 学习工作台</title>
+<style>
+:root{--ink:#17293a;--muted:#627487;--line:#e0e7eb;--bg:#f4f7f8;--white:#fff;--primary:#176d67;--dark:#142e37;--soft:#e8f3ef;--danger:#a93d42;--radius:14px;font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #65b7ad;outline-offset:2px}[hidden]{display:none!important}h1,h2,h3,p{margin:0}h1{font-size:clamp(24px,3vw,34px);letter-spacing:-1px}h2{font-size:20px}h3{font-size:16px}.muted{color:var(--muted);font-size:13px;line-height:1.65}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--primary);margin-bottom:10px}.brand{display:flex;align-items:center;gap:12px;font-weight:750;font-size:22px;letter-spacing:-.5px}.brand-icon{display:grid;place-items:center;width:39px;height:39px;border-radius:11px;background:#a7dfc6;color:#153e38;font-size:21px;font-weight:800}.brand small{display:block;letter-spacing:2px;font-size:9px;font-weight:500;color:#9eb5bc;margin-top:3px}.btn{border:1px solid transparent;border-radius:9px;padding:10px 16px;font-weight:600;font-size:14px;color:white;background:var(--primary);white-space:nowrap}.btn:hover:not(:disabled){filter:brightness(.94)}.btn.secondary{background:white;border-color:var(--line);color:var(--ink)}.btn.danger{background:#fff4f3;color:var(--danger);border-color:#f0d7d7}.btn.small{padding:7px 11px;font-size:12px}.btn.full{width:100%}.field{display:grid;gap:7px;margin:16px 0}.field label{font-size:13px;font-weight:650}input,select{min-width:0;width:100%;padding:11px 12px;border:1px solid #d7e1e5;border-radius:9px;background:white;color:var(--ink)}input::placeholder{color:#8b98a3}.notice{padding:12px 15px;border:1px solid #cce4db;background:#edf7f2;color:#166351;border-radius:9px;font-size:13px;line-height:1.6;margin:12px 0;overflow-wrap:anywhere}.notice.error{background:#fff1ef;border-color:#f2d1cd;color:#a53935}.notice.info{background:#eef5fc;border-color:#d7e5f1;color:#365c7e}.card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 3px 12px #1d3a4410}.auth{min-height:100vh;display:grid;grid-template-columns: minmax(300px, .9fr) minmax(350px,1.1fr)}.auth-brand{background:var(--dark);color:white;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(30px,6vw,85px);min-height:100%}.auth-brand h1{font-size:clamp(36px,5vw,64px);line-height:1.17;max-width:500px;letter-spacing:-2px;margin:20px 0}.auth-brand .muted{color:#b9cdd0;font-size:15px;max-width:390px}.auth-brand .eyebrow{color:#a7dfc6}.auth-form{display:grid;place-items:center;padding:40px 24px}.auth-inner{width:min(100%,420px)}.tabs{display:flex;gap:6px;background:#e7edef;padding:4px;border-radius:10px;margin:25px 0}.tabs button{flex:1;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:7px}.tabs button.active{background:white;color:var(--ink);font-weight:700;box-shadow:0 1px 5px #0001}.auth-inner .hint{margin-top:20px}.app{min-height:100vh;display:grid;grid-template-columns:235px minmax(0,1fr)}.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:var(--dark);color:white;padding:26px 18px}.sidebar .brand{padding:0 7px;margin-bottom:38px}.nav-label{font-size:10px;letter-spacing:2px;color:#9eb5bc;padding:0 12px;margin-bottom:10px}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#c5d5d8;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 12px;border-radius:9px;font-size:14px}.nav button:hover{background:#ffffff0c}.nav button.active{background:#ffffff19;color:#d5f8e6;font-weight:700}.nav button .symbol{font-size:17px;width:22px;text-align:center}.nav button small{margin-left:auto;font-size:10px;color:#aabfc3}.side-bottom{margin-top:auto;border-top:1px solid #ffffff20;padding:18px 8px 0}.side-bottom .muted{color:#a8bfc5}.side-bottom button{margin-top:14px;background:transparent;border:1px solid #ffffff33;color:white;width:100%}.workspace{min-width:0}.topbar{height:69px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,48px);gap:15px}.topbar .crumb{font-size:13px;color:var(--muted)}.identity{font-size:13px;display:flex;gap:9px;align-items:center}.avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--primary);font-weight:bold}.content{max-width:1350px;margin:0 auto;padding:32px clamp(18px,4vw,48px) 55px}.heading{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:22px}.heading p{margin-top:7px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0 24px}.metric{padding:18px 20px;background:white;border:1px solid var(--line);border-radius:var(--radius)}.metric .value{font-size:30px;font-weight:700;margin:10px 0 4px;font-variant-numeric:tabular-nums}.metric .value.accent{color:var(--primary)}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:18px}.search{display:flex;gap:8px;flex:1;min-width:220px}.search input{flex:1}.toolbar select{width:auto}.filter-group{display:flex;gap:5px;flex-wrap:wrap}.filter-group button{background:white;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--muted);font-size:13px}.filter-group button.active{background:var(--soft);border-color:#b4d9ce;color:var(--primary);font-weight:700}.list{display:grid;gap:10px}.task{display:flex;align-items:center;gap:13px;border:1px solid var(--line);padding:16px;border-radius:11px}.task-content{flex:1;min-width:0}.item-title{font-weight:650;overflow-wrap:anywhere;line-height:1.5}.task.done .item-title{text-decoration:line-through;color:var(--muted)}.actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.check{width:32px;height:32px;flex:none;border:1px solid #bccdd0;background:white;border-radius:50%;font-size:18px;color:var(--primary);font-weight:700}.task.done .check{background:var(--soft);border-color:#b5d5c7}.tag{font-size:11px;padding:5px 9px;border-radius:20px;background:#fff3d8;color:#8a631d;white-space:nowrap}.tag.done{background:var(--soft);color:var(--primary)}.pagination{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}.empty{padding:45px 16px;text-align:center;color:var(--muted);font-size:14px;line-height:1.8}.goals-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.goal{border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}.goal-head{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:20px}.progress-track{height:9px;background:#e8efed;border-radius:10px;overflow:hidden;margin:10px 0}.progress-fill{height:100%;background:#238477;border-radius:10px}.progress-label{display:flex;justify-content:space-between;gap:6px;align-items:end;font-size:13px;color:var(--muted)}.progress-label strong{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}.goal .meta{margin-top:14px}.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.overview-card{display:grid;gap:12px}.overview-card .btn{justify-self:start}.placeholder{min-height:230px;display:grid;place-content:center;text-align:center;gap:13px}.placeholder .big{font-size:36px;color:var(--primary)}.profile-grid{display:grid;gap:12px}.profile-row{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}.profile-row:last-child{border-bottom:0}.profile-row strong{overflow-wrap:anywhere;text-align:right}.footer{font-size:11px;color:var(--muted);margin-top:26px;letter-spacing:.3px}dialog{border:1px solid var(--line);border-radius:16px;width:min(92vw,460px);padding:25px;color:var(--ink);box-shadow:0 18px 80px #142e3740}dialog::backdrop{background:#142e3766}dialog .heading{margin-bottom:14px}dialog .actions{justify-content:flex-end;margin-top:24px}.close{border:0;background:transparent;color:var(--muted);font-size:24px;line-height:1;padding:3px 7px}
+@media(max-width:850px){.app{grid-template-columns:190px minmax(0,1fr)}.sidebar{padding:20px 10px}.goals-grid,.overview-grid{grid-template-columns:1fr}.auth{grid-template-columns:1fr}.auth-brand{min-height:230px;padding:28px}.auth-brand h1{font-size:36px;margin:20px 0 10px}.auth-brand .auth-foot{display:none}.auth-form{padding:32px 24px}.task{flex-wrap:wrap}.task .actions{margin-left:45px}.metrics{gap:8px}.metric{padding:12px}.metric .value{font-size:24px}}
+@media(max-width:600px){.app{display:block}.sidebar{position:static;height:auto;padding:15px;gap:12px}.sidebar .brand{margin:0;padding:0}.nav-label,.side-bottom .muted{display:none}.nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.nav button{padding:9px 7px;font-size:12px;gap:4px}.nav button small{display:none}.nav button .symbol{font-size:13px;width:14px}.side-bottom{border:0;margin:0;padding:0}.side-bottom button{margin:0;width:auto;font-size:12px;padding:7px 12px}.topbar{height:52px}.content{padding-top:22px}.card{padding:15px}.metrics{grid-template-columns:1fr 1fr 1fr}.metric .muted{font-size:11px}.metric .value{font-size:22px}.task .actions{margin-left:0}.search{min-width:100%}}
+</style>
 </head>
-
 <body>
-
-<header>
-    <div class="logo">Study<span>Hub</span></div>
-    <div id="headerUser" class="muted" style="color:#cbd5e1">
-        未登录
-    </div>
-</header>
-
-<main class="container">
-
-    <!-- 登录页面 -->
-    <section id="loginPage" class="login-box card">
-        <h2>欢迎回来 👋</h2>
-        <p class="muted">登录 StudyHub，管理你的学习任务。</p>
-
-        <div id="loginNotice"></div>
-
-        <div class="field">
-            <label>用户名</label>
-            <input id="username" placeholder="请输入用户名">
-        </div>
-
-        <div class="field">
-            <label>密码</label>
-            <input id="password" type="password"
-                   placeholder="请输入密码">
-        </div>
-
-        <button class="btn full" id="loginBtn" onclick="login()">
-            登录
-        </button>
-
-        <p class="muted" style="margin-top:20px">
-            当前使用真实后端 API，不使用模拟登录。
-        </p>
-    </section>
-
-    <!-- 主页面 -->
-    <section id="mainPage" class="hidden">
-
-        <div class="topline">
-            <div>
-                <h2>我的学习空间</h2>
-                <p class="muted">今天也要向目标迈进一步。</p>
-            </div>
-
-            <button class="btn btn-secondary"
-                    onclick="logout()">退出登录</button>
-        </div>
-
-        <div id="mainNotice"></div>
-
-        <!-- API 配置 -->
-        <details class="config">
-            <summary>API 连接配置</summary>
-            <div class="config-content">
-                <div class="field">
-                    <label>后端 API 地址</label>
-                    <input id="apiBase" value="http://localhost:8080">
-                </div>
-                <button class="btn btn-secondary"
-                        onclick="saveApi()">保存地址</button>
-            </div>
-        </details>
-
-        <!-- 统计卡片 -->
-        <div class="stats">
-            <div class="stat">
-                <small>本页任务</small>
-                <strong class="blue" id="totalCount">0</strong>
-            </div>
-
-            <div class="stat">
-                <small>已完成</small>
-                <strong class="green" id="doneCount">0</strong>
-            </div>
-
-            <div class="stat">
-                <small>待完成</small>
-                <strong class="orange" id="pendingCount">0</strong>
-            </div>
-        </div>
-
-        <!-- 任务管理 -->
-        <div class="card">
-            <div class="topline">
-                <div>
-                    <h2>学习任务</h2>
-                    <p class="muted">管理你的每日学习计划。</p>
-                </div>
-
-                <button class="btn" onclick="openModal()">
-                    + 新建任务
-                </button>
-            </div>
-
-            <div class="toolbar">
-                <div class="filters">
-                    <button class="filter active"
-                            data-filter="all"
-                            onclick="changeFilter('all')">全部</button>
-                    <button class="filter"
-                            data-filter="false"
-                            onclick="changeFilter('false')">未完成</button>
-                    <button class="filter"
-                            data-filter="true"
-                            onclick="changeFilter('true')">已完成</button>
-                </div>
-
-                <button class="btn btn-secondary btn-small"
-                        onclick="loadTasks()">刷新列表</button>
-            </div>
-
-            <div id="taskList" class="task-list">
-                <div class="empty">请先登录并加载任务。</div>
-            </div>
-
-            <div class="pagination">
-                <button class="btn btn-secondary btn-small"
-                        id="prevBtn" onclick="changePage(-1)">上一页</button>
-
-                <span class="muted" id="pageInfo">第 1 页</span>
-
-                <button class="btn btn-secondary btn-small"
-                        id="nextBtn" onclick="changePage(1)">下一页</button>
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<footer>
-    StudyHub · Personal Learning Management System
-</footer>
-
-<!-- 新增/编辑任务弹窗 -->
-<div id="taskModal" class="modal hidden">
-    <div class="modal-content">
-        <h2 id="modalTitle">新建任务</h2>
-
-        <div class="field">
-            <label>任务标题</label>
-            <input id="taskTitle"
-                   maxlength="200"
-                   placeholder="例如：学习 Spring Boot">
-        </div>
-
-        <div class="field hidden" id="doneField">
-            <label>完成状态</label>
-            <select id="taskDone">
-                <option value="false">未完成</option>
-                <option value="true">已完成</option>
-            </select>
-        </div>
-
-        <div id="modalNotice"></div>
-
-        <div class="modal-actions">
-            <button class="btn btn-secondary"
-                    onclick="closeModal()">取消</button>
-
-            <button class="btn" id="saveTaskBtn"
-                    onclick="saveTask()">保存</button>
-        </div>
-    </div>
+<section id="authPage" class="auth">
+  <aside class="auth-brand">
+    <div class="brand"><span class="brand-icon">S</span><div>StudyHub<small>LEARNING WORKSPACE</small></div></div>
+    <div><div class="eyebrow">PERSONAL STUDY SYSTEM</div><h1>把学习计划，<br>变成真实进度。</h1><p class="muted">管理任务、制定目标，记录每一次努力。你的学习空间，井然有序。</p></div>
+    <div class="auth-foot muted">StudyHub · Spring Boot / JWT / MyBatis</div>
+  </aside>
+  <main class="auth-form"><div class="auth-inner">
+    <div class="eyebrow">WELCOME TO STUDYHUB</div><h2 id="authTitle">登录学习工作台</h2><p class="muted" style="margin-top:8px">使用你的 StudyHub 账号继续。</p>
+    <div class="tabs"><button id="loginTab" type="button" class="active">登录</button><button id="registerTab" type="button">注册</button></div>
+    <div id="authNotice" role="status" aria-live="polite" hidden></div>
+    <form id="authForm"><div class="field"><label for="username">用户名</label><input id="username" name="username" required maxlength="255" autocomplete="username" placeholder="请输入用户名"></div>
+      <div class="field"><label for="password">密码</label><input id="password" name="password" type="password" required autocomplete="current-password" placeholder="请输入密码"></div>
+      <div id="ageField" class="field" hidden><label for="age">年龄（选填）</label><input id="age" type="number" min="1" max="150" step="1" placeholder="例如 23"></div>
+      <button id="authSubmit" class="btn full" type="submit">登录</button></form>
+    <p class="muted hint">连接真实后端 API。此教学项目使用 localStorage 保存 JWT，请勿在共享设备上保留登录状态。</p>
+  </div></main>
+</section>
+<div id="appPage" class="app" hidden>
+  <aside class="sidebar"><div class="brand"><span class="brand-icon">S</span><div>StudyHub<small>LEARNING WORKSPACE</small></div></div><div class="nav-label">工作空间</div>
+    <nav class="nav" aria-label="工作台导航">
+      <button type="button" data-view="overview"><span class="symbol">▦</span>学习概览</button>
+      <button type="button" data-view="tasks"><span class="symbol">✓</span>任务管理</button>
+      <button type="button" data-view="goals"><span class="symbol">◎</span>学习目标</button>
+      <button type="button" data-view="records"><span class="symbol">▤</span>学习记录<small>待接入</small></button>
+      <button type="button" data-view="stats"><span class="symbol">▥</span>学习统计<small>待接入</small></button>
+      <button type="button" data-view="profile"><span class="symbol">◉</span>个人中心</button>
+    </nav><div class="side-bottom"><p class="muted">StudyHub · 开发版</p><button id="logout" type="button" class="btn">退出登录</button></div>
+  </aside>
+  <main class="workspace"><header class="topbar"><span id="breadcrumb" class="crumb">工作台 / 学习概览</span><div class="identity"><span class="avatar" id="avatar">U</span><span id="headerUser">已登录</span></div></header>
+  <div class="content"><div id="mainNotice" role="status" aria-live="polite" hidden></div>
+    <section id="view-overview" hidden><div class="heading"><div><div class="eyebrow">YOUR LEARNING SPACE</div><h1>学习概览</h1><p class="muted">从任务开始，把学习目标一步步完成。</p></div><button type="button" class="btn secondary" id="refreshOverview">刷新概览</button></div>
+      <div class="metrics"><div class="metric"><div class="muted">全部任务</div><div id="ovTasks" class="value">—</div><div class="muted">当前账号</div></div><div class="metric"><div class="muted">已完成任务</div><div id="ovDone" class="value accent">—</div><div class="muted">当前账号</div></div><div class="metric"><div class="muted">学习目标</div><div id="ovGoals" class="value">—</div><div class="muted">当前账号</div></div></div>
+      <div id="overviewStatus" class="muted" role="status"></div><div class="overview-grid"><article class="card overview-card"><div class="eyebrow">TASKS</div><h2>每日学习任务</h2><p class="muted">新建、编辑、完成任务，专注于下一步行动。</p><button class="btn" data-goto="tasks">管理任务</button></article><article class="card overview-card"><div class="eyebrow">GOALS</div><h2>长期学习目标</h2><p class="muted">制定目标时长，查看每个目标的实际进度。</p><button class="btn" data-goto="goals">查看目标</button></article></div></section>
+    <section id="view-tasks" hidden><div class="heading"><div><div class="eyebrow">TASK MANAGEMENT</div><h1>任务管理</h1><p class="muted">搜索、筛选并安排你的学习任务。</p></div><button type="button" id="newTask" class="btn">＋ 新建任务</button></div>
+      <div class="metrics"><div class="metric"><div class="muted">符合筛选条件</div><div class="value" id="taskTotal">—</div><div class="muted">全部匹配记录</div></div><div class="metric"><div class="muted">本页已完成</div><div class="value accent" id="taskDoneCount">—</div><div class="muted">仅当前页</div></div><div class="metric"><div class="muted">本页待完成</div><div class="value" id="taskPendingCount">—</div><div class="muted">仅当前页</div></div></div>
+      <div class="card"><div class="toolbar"><form class="search" id="taskSearchForm"><input id="taskSearch" maxlength="200" aria-label="搜索任务标题" placeholder="搜索任务标题…"><button class="btn secondary">搜索</button></form><div class="filter-group" id="taskFilters"><button type="button" data-filter="all" class="active">全部</button><button type="button" data-filter="false">未完成</button><button type="button" data-filter="true">已完成</button></div><button type="button" class="btn secondary" id="refreshTasks">刷新</button></div><div id="taskList" class="list" aria-live="polite"></div><div class="pagination"><span class="muted" id="taskPageInfo">第 1 页</span><div class="actions"><select id="taskPageSize" aria-label="任务每页数量"><option value="10">10 条/页</option><option value="20">20 条/页</option><option value="50">50 条/页</option></select><button type="button" id="taskPrev" class="btn small secondary">上一页</button><button type="button" id="taskNext" class="btn small secondary">下一页</button></div></div></div></section>
+    <section id="view-goals" hidden><div class="heading"><div><div class="eyebrow">LEARNING GOALS</div><h1>学习目标</h1><p class="muted">制定目标，查看已完成时长与学习进度。</p></div><button type="button" id="newGoal" class="btn">＋ 新建目标</button></div>
+      <div class="metrics"><div class="metric"><div class="muted">符合搜索条件</div><div class="value" id="goalTotal">—</div><div class="muted">全部匹配目标</div></div><div class="metric"><div class="muted">本页目标时长</div><div class="value" id="goalTarget">—</div><div class="muted">分钟 · 仅当前页</div></div><div class="metric"><div class="muted">本页已完成时长</div><div class="value accent" id="goalCompleted">—</div><div class="muted">分钟 · 仅当前页</div></div></div>
+      <div class="card"><div class="toolbar"><form class="search" id="goalSearchForm"><input id="goalSearch" maxlength="200" aria-label="搜索目标标题" placeholder="搜索学习目标…"><button class="btn secondary">搜索</button></form><button type="button" class="btn secondary" id="refreshGoals">刷新</button></div><div id="goalList" class="goals-grid" aria-live="polite"></div><div class="pagination"><span id="goalPageInfo" class="muted">第 1 页</span><div class="actions"><select id="goalPageSize" aria-label="目标每页数量"><option value="10">10 条/页</option><option value="20">20 条/页</option><option value="50">50 条/页</option></select><button type="button" id="goalPrev" class="btn small secondary">上一页</button><button type="button" id="goalNext" class="btn small secondary">下一页</button></div></div></div></section>
+    <section id="view-records" hidden><div class="heading"><div><div class="eyebrow">LEARNING RECORDS</div><h1>学习记录</h1></div></div><div class="card placeholder"><span class="big">▤</span><h2>学习记录模块开发中</h2><p class="muted">待新增、分页查询及删除接口验收后接入。<br>目前不会向未完成的接口发送请求。</p><button class="btn secondary" data-goto="goals">返回学习目标</button></div></section>
+    <section id="view-stats" hidden><div class="heading"><div><div class="eyebrow">ANALYTICS</div><h1>学习统计</h1></div></div><div class="card placeholder"><span class="big">▥</span><h2>统计模块待接入</h2><p class="muted">后续接入实际学习记录与聚合统计，不展示模拟数据。</p><button class="btn secondary" data-goto="overview">返回学习概览</button></div></section>
+    <section id="view-profile" hidden><div class="heading"><div><div class="eyebrow">ACCOUNT</div><h1>个人中心</h1><p class="muted">当前登录会话信息。</p></div></div><div class="card profile-grid"><div class="profile-row"><span>用户名</span><strong id="profileName">—</strong></div><div class="profile-row"><span>用户 ID</span><strong id="profileId">—</strong></div><div class="profile-row"><span>后端连接</span><strong id="profileApi">—</strong></div><div class="profile-row"><span>身份认证</span><strong>JWT / Bearer</strong></div><p class="muted">用户名和 ID 为 JWT 中的展示信息，实际身份与权限由服务器验证。退出登录会清除本地令牌；服务器端令牌撤销尚未实现。</p></div></section>
+    <div class="footer">STUDYHUB / PERSONAL LEARNING MANAGEMENT SYSTEM</div>
+  </div></main>
 </div>
-
+<dialog id="taskDialog"><form id="taskForm"><div class="heading"><h2 id="taskDialogTitle">新建任务</h2><button class="close" type="button" data-close="taskDialog" aria-label="关闭">×</button></div><div class="field"><label for="taskTitle">任务标题</label><input id="taskTitle" required maxlength="200" placeholder="例如：学习 Spring Boot"></div><div id="taskDoneField" class="field" hidden><label for="taskDone">完成状态</label><select id="taskDone"><option value="false">未完成</option><option value="true">已完成</option></select></div><div id="taskDialogNotice" role="status" hidden></div><div class="actions"><button type="button" class="btn secondary" data-close="taskDialog">取消</button><button type="submit" class="btn" id="taskSave">保存任务</button></div></form></dialog>
+<dialog id="goalDialog"><form id="goalForm"><div class="heading"><h2>新建学习目标</h2><button class="close" type="button" data-close="goalDialog" aria-label="关闭">×</button></div><div class="field"><label for="goalTitle">目标标题</label><input id="goalTitle" maxlength="200" required placeholder="例如：Java 后端学习"></div><div class="field"><label for="goalMinutes">目标学习时长（分钟）</label><input id="goalMinutes" type="number" min="1" max="2147483647" step="1" required placeholder="例如：600"></div><div id="goalDialogNotice" role="status" hidden></div><div class="actions"><button type="button" class="btn secondary" data-close="goalDialog">取消</button><button type="submit" id="goalSave" class="btn">创建目标</button></div></form></dialog>
 <script>
-    /* ==============================
-       1. 全局配置
-    ============================== */
-
-    const CONFIG = {
-        login: "/users/login",
-        tasks: "/tasks",
-        pageSize: 10
-    };
-
-    let token = localStorage.getItem("studyhub_token") || "";
-    let apiBase = localStorage.getItem("studyhub_api")
-        || "http://localhost:8080";
-
-    let currentPage = 1;
-    let currentFilter = "all";
-    let editingId = null;
-    let busy = false;
-
-    const $ = id => document.getElementById(id);
-
-    $("apiBase").value = apiBase;
-
-
-    /* ==============================
-       2. 通用提示
-    ============================== */
-
-    function notice(id, message, type = "info") {
-        $(id).replaceChildren();
-
-        if (!message) return;
-
-        const box = document.createElement("div");
-        box.className = "notice " + type;
-        box.textContent = message;
-
-        $(id).appendChild(box);
-    }
-
-
-    /* ==============================
-       3. API 请求封装
-    ============================== */
-
-    async function apiRequest(path, options = {}) {
-
-        const headers = {
-            ...(options.headers || {})
-        };
-
-        if (token) {
-            headers.Authorization = "Bearer " + token;
-        }
-
-        if (options.body !== undefined) {
-            headers["Content-Type"] = "application/json";
-        }
-
-        let response;
-
-        try {
-            response = await fetch(
-                apiBase.replace(/\/+$/, "") + path,
-                {
-                    ...options,
-                    headers
-                }
-            );
-        } catch (error) {
-            throw new Error(
-                "无法连接后端，请检查 Spring Boot 是否启动及 CORS 配置。"
-            );
-        }
-
-        const text = await response.text();
-
-        let result = null;
-
-        if (text) {
-            try {
-                result = JSON.parse(text);
-            } catch {
-                throw new Error("服务器返回的不是有效 JSON。");
-            }
-        }
-
-        if (response.status === 401) {
-            token = "";
-            localStorage.removeItem("studyhub_token");
-            showLogin();
-            throw new Error("登录已失效，请重新登录。");
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                result?.message || `HTTP ${response.status}`
-            );
-        }
-
-        if (result && result.code !== undefined
-            && result.code !== 200) {
-            throw new Error(result.message || "业务请求失败");
-        }
-
-        return result;
-    }
-
-
-    /* ==============================
-       4. 登录
-    ============================== */
-
-    async function login() {
-
-        const username = $("username").value.trim();
-        const password = $("password").value;
-
-        if (!username || !password) {
-            notice("loginNotice", "请输入用户名和密码。", "error");
-            return;
-        }
-
-        const btn = $("loginBtn");
-        btn.disabled = true;
-        btn.textContent = "登录中...";
-
-        try {
-            const result = await apiRequest(CONFIG.login, {
-                method: "POST",
-                body: JSON.stringify({ username, password })
-            });
-
-            const jwt = typeof result.data === "string"
-                ? result.data
-                : result.data?.token;
-
-            if (!jwt) {
-                throw new Error("登录成功，但没有获取到 JWT。");
-            }
-
-            token = jwt;
-
-            // 教学 Demo 使用 localStorage 保存 JWT。
-            localStorage.setItem("studyhub_token", token);
-
-            showMain();
-            await loadTasks();
-
-        } catch (error) {
-            notice("loginNotice", error.message, "error");
-        } finally {
-            btn.disabled = false;
-            btn.textContent = "登录";
-        }
-    }
-
-
-    /* ==============================
-       5. 登录状态切换
-    ============================== */
-
-    function showLogin() {
-        $("loginPage").classList.remove("hidden");
-        $("mainPage").classList.add("hidden");
-        $("headerUser").textContent = "未登录";
-    }
-
-    function showMain() {
-        $("loginPage").classList.add("hidden");
-        $("mainPage").classList.remove("hidden");
-
-        $("headerUser").textContent = "已登录";
-    }
-
-    function logout() {
-        token = "";
-        localStorage.removeItem("studyhub_token");
-        showLogin();
-        notice("loginNotice", "已退出登录。", "success");
-    }
-
-
-    /* ==============================
-       6. API 地址配置
-    ============================== */
-
-    function saveApi() {
-        const value = $("apiBase").value.trim();
-
-        if (!/^https?:\/\/[^/]+/i.test(value)) {
-            notice("mainNotice", "请输入有效的 HTTP API 地址。", "error");
-            return;
-        }
-
-        apiBase = value.replace(/\/+$/, "");
-        localStorage.setItem("studyhub_api", apiBase);
-
-        notice("mainNotice", "API 地址已保存。", "success");
-    }
-
-
-    /* ==============================
-       7. 解析任务列表响应
-    ============================== */
-
-    // 兼容常见分页结构。
-    // 如果你的 PageBean 字段名称不同，
-    // 后续只需要调整这个函数。
-
-    function extractTasks(result) {
-
-        const data = result?.data;
-
-        if (Array.isArray(data)) {
-            return {
-                items: data,
-                total: data.length,
-                totalPages: 1
-            };
-        }
-
-        if (!data || typeof data !== "object") {
-            return { items: [], total: 0, totalPages: 1 };
-        }
-
-        const items =
-            data.records ||
-            data.list ||
-            data.items ||
-            data.content ||
-            data.tasks ||
-            [];
-
-        if (!Array.isArray(items)) {
-            throw new Error(
-                "无法识别任务列表结构，请检查后端 PageBean 返回字段。"
-            );
-        }
-
-        const total = Number(data.total ?? items.length);
-
-        const totalPages = Number(
-            data.totalPages ??
-            data.totalPagesCount ??
-            Math.max(1, Math.ceil(total / CONFIG.pageSize))
-        );
-
-        return { items, total, totalPages };
-    }
-
-
-    /* ==============================
-       8. 查询任务列表
-    ============================== */
-
-    async function loadTasks() {
-
-        if (!token || busy) return;
-
-        busy = true;
-
-        $("taskList").innerHTML =
-            '<div class="empty">正在加载任务...</div>';
-
-        try {
-
-            const params = new URLSearchParams({
-                page: currentPage,
-                pageSize: CONFIG.pageSize
-            });
-
-            if (currentFilter !== "all") {
-                params.set("done", currentFilter);
-            }
-
-            const result = await apiRequest(
-                CONFIG.tasks + "?" + params.toString()
-            );
-
-            const page = extractTasks(result);
-
-            renderTasks(page.items, page);
-
-            notice("mainNotice", "");
-
-        } catch (error) {
-
-            $("taskList").textContent = error.message;
-
-            notice("mainNotice", error.message, "error");
-
-        } finally {
-            busy = false;
-        }
-    }
-
-
-    /* ==============================
-       9. 渲染任务列表
-    ============================== */
-
-    function normalizeDone(value) {
-        return value === true ||
-            value === 1 ||
-            value === "1" ||
-            value === "true";
-    }
-
-    function renderTasks(tasks, page) {
-
-        $("taskList").replaceChildren();
-
-        const doneCount = tasks.filter(
-            task => normalizeDone(task.done)
-        ).length;
-
-        $("totalCount").textContent = page.total;
-        $("doneCount").textContent = doneCount;
-        $("pendingCount").textContent =
-            tasks.length - doneCount;
-
-        $("pageInfo").textContent =
-            `第 ${currentPage} 页 / 共 ${page.totalPages} 页`;
-
-        $("prevBtn").disabled = currentPage <= 1;
-        $("nextBtn").disabled =
-            currentPage >= page.totalPages;
-
-        if (!tasks.length) {
-            const empty = document.createElement("div");
-            empty.className = "empty";
-            empty.textContent = "暂无任务，点击右上角创建一个吧。";
-            $("taskList").appendChild(empty);
-            return;
-        }
-
-        tasks.forEach(task => {
-
-            const isDone = normalizeDone(task.done);
-
-            const row = document.createElement("div");
-            row.className = "task";
-
-            const icon = document.createElement("span");
-            icon.textContent = isDone ? "✓" : "○";
-            icon.style.color = isDone ? "#199c70" : "#9aa3b1";
-            icon.style.fontSize = "21px";
-
-            const content = document.createElement("div");
-            content.className = "task-title" +
-                (isDone ? " done" : "");
-
-            const title = document.createElement("div");
-            title.textContent = task.title || "未命名任务";
-
-            const meta = document.createElement("div");
-            meta.className = "task-meta";
-            meta.textContent =
-                "ID: " + task.id +
-                (task.createdAt || task.created_at
-                    ? " · 创建时间: " +
-                    (task.createdAt || task.created_at)
-                    : "");
-
-            content.append(title, meta);
-
-            const status = document.createElement("span");
-            status.className = "status" +
-                (isDone ? " done" : "");
-
-            status.textContent = isDone ? "已完成" : "待完成";
-
-            const actions = document.createElement("div");
-            actions.className = "task-actions";
-
-            const edit = document.createElement("button");
-            edit.className = "btn btn-secondary btn-small";
-            edit.textContent = "编辑";
-            edit.onclick = () => openModal(task);
-
-            const remove = document.createElement("button");
-            remove.className = "btn btn-danger btn-small";
-            remove.textContent = "删除";
-            remove.onclick = () => deleteTask(task.id);
-
-            actions.append(edit, remove);
-
-            row.append(icon, content, status, actions);
-
-            $("taskList").appendChild(row);
-        });
-    }
-
-
-    /* ==============================
-       10. 筛选和分页
-    ============================== */
-
-    function changeFilter(value) {
-
-        currentFilter = value;
-        currentPage = 1;
-
-        document.querySelectorAll(".filter").forEach(btn => {
-            btn.classList.toggle(
-                "active",
-                btn.dataset.filter === value
-            );
-        });
-
-        loadTasks();
-    }
-
-    function changePage(delta) {
-
-        currentPage = Math.max(1, currentPage + delta);
-        loadTasks();
-    }
-
-
-    /* ==============================
-       11. 新建 / 编辑弹窗
-    ============================== */
-
-    function openModal(task = null) {
-
-        editingId = task ? task.id : null;
-
-        $("modalTitle").textContent =
-            task ? "修改任务" : "新建任务";
-
-        $("taskTitle").value = task ? task.title : "";
-
-        $("doneField").classList.toggle(
-            "hidden", !task
-        );
-
-        $("taskDone").value =
-            task && normalizeDone(task.done)
-                ? "true" : "false";
-
-        notice("modalNotice", "");
-
-        $("taskModal").classList.remove("hidden");
-
-        $("taskTitle").focus();
-    }
-
-    function closeModal() {
-        $("taskModal").classList.add("hidden");
-    }
-
-
-    /* ==============================
-       12. 保存任务
-    ============================== */
-
-    async function saveTask() {
-
-        const title = $("taskTitle").value.trim();
-
-        if (!title) {
-            notice("modalNotice", "任务标题不能为空。", "error");
-            return;
-        }
-
-        if (title.length > 200) {
-            notice("modalNotice", "标题最多 200 个字符。", "error");
-            return;
-        }
-
-        const editing = editingId !== null;
-
-        const body = editing
-            ? {
-                title,
-                done: $("taskDone").value === "true"
-            }
-            : { title };
-
-        const btn = $("saveTaskBtn");
-        btn.disabled = true;
-        btn.textContent = "保存中...";
-
-        try {
-
-            const path = editing
-                ? CONFIG.tasks + "/" + encodeURIComponent(editingId)
-                : CONFIG.tasks;
-
-            await apiRequest(path, {
-                method: editing ? "PUT" : "POST",
-                body: JSON.stringify(body)
-            });
-
-            closeModal();
-
-            notice(
-                "mainNotice",
-                editing ? "任务修改成功。" : "任务创建成功。",
-                "success"
-            );
-
-            await loadTasks();
-
-        } catch (error) {
-
-            notice("modalNotice", error.message, "error");
-
-        } finally {
-            btn.disabled = false;
-            btn.textContent = "保存";
-        }
-    }
-
-
-    /* ==============================
-       13. 删除任务
-    ============================== */
-
-    async function deleteTask(id) {
-
-        if (!confirm("确定要删除这个任务吗？")) {
-            return;
-        }
-
-        try {
-
-            await apiRequest(
-                CONFIG.tasks + "/" + encodeURIComponent(id),
-                { method: "DELETE" }
-            );
-
-            notice("mainNotice", "任务删除成功。", "success");
-
-            await loadTasks();
-
-        } catch (error) {
-
-            notice("mainNotice", error.message, "error");
-        }
-    }
-
-
-    /* ==============================
-       14. 页面初始化
-    ============================== */
-
-    async function init() {
-
-        $("apiBase").value = apiBase;
-
-        if (token) {
-            showMain();
-            await loadTasks();
-        } else {
-            showLogin();
-        }
-    }
-
-    $("password").addEventListener("keydown", event => {
-        if (event.key === "Enter") login();
-    });
-
-    $("taskTitle").addEventListener("keydown", event => {
-        if (event.key === "Enter") saveTask();
-    });
-
-    init();
-
+'use strict';
+// 1. API 契约：和 Spring Boot 静态页面使用同源地址，不把 JWT 发送到任意配置的服务器。
+const API = {login:'/users/login',register:'/users/register',tasks:'/tasks',goals:'/goals',goalPage:'/goals/page'};
+const $ = id => document.getElementById(id);
+const KEY = 'studyhub_token';
+let token = localStorage.getItem(KEY) || '';
+let epoch = 0; // 登录会话版本，阻止旧请求覆盖切换账号后的页面
+let view = 'overview';
+let authMode = 'login';
+let editingId = null;
+let overviewSeq = 0;
+const state = {task:{page:1,size:10,title:'',done:'all',pages:1,seq:0},goal:{page:1,size:10,title:'',pages:1,seq:0}};
+const labels = {overview:'学习概览',tasks:'任务管理',goals:'学习目标',records:'学习记录',stats:'学习统计',profile:'个人中心'};
+const num = n => Number.isFinite(Number(n)) ? Number(n) : 0;
+function element(tag, cls='', text=''){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=='')n.textContent=String(text);return n;}
+function notice(id,message='',type='error'){const n=$(id);n.textContent=message;n.className='notice '+type;n.hidden=!message;}
+function empty(id,message){$(id).replaceChildren(element('div','empty',message));}
+function errorMessage(error){return error instanceof Error ? error.message : String(error);}
+function isStale(e){return e && e.name==='StaleSession';}
+function stale(){const e=new Error('会话已变化');e.name='StaleSession';return e;}
+function setBusy(btn,working,label){btn.disabled=working;btn.textContent=label;}
+async function apiRequest(path,{method='GET',body,publicRequest=false}={}){
+  if(location.protocol!=='http:' && location.protocol!=='https:')throw new Error('请通过 Spring Boot 地址访问页面（http://localhost:8080/），不要直接双击 HTML 文件。');
+  const currentEpoch=epoch;
+  const headers={Accept:'application/json'};
+  if(!publicRequest && token)headers.Authorization='Bearer '+token;
+  if(body!==undefined)headers['Content-Type']='application/json';
+  let response;
+  try{response=await fetch(path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});}catch(e){if(epoch!==currentEpoch)throw stale();throw new Error('无法连接后端，请确认 Spring Boot 已启动。');}
+  if(epoch!==currentEpoch)throw stale();
+  const text=await response.text();
+  if(epoch!==currentEpoch)throw stale();
+  let result=null;
+  if(text){try{result=JSON.parse(text);}catch{/* 401 等响应可能为空或 HTML */}}
+  if(response.status===401 || result?.code===401){if(!publicRequest){endSession('登录已失效，请重新登录。','error');throw stale();}throw new Error(result?.message||'用户名或密码错误。');}
+  if(!response.ok)throw new Error(result?.message||`请求失败（HTTP ${response.status}）`);
+  if(!result || typeof result!=='object')throw new Error('服务器未返回有效的 JSON 响应。');
+  if(result.code!==200)throw new Error(result.message||'业务请求失败。');
+  return result.data;
+}
+// 2. 注册登录及本地会话。JWT 解码只用于显示，不用于权限判断。
+function claims(){try{const s=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');const bytes=Uint8Array.from(atob(s.padEnd(Math.ceil(s.length/4)*4,'=')),x=>x.charCodeAt(0));return JSON.parse(new TextDecoder().decode(bytes));}catch{return {};}}
+function resetState(){for(const s of Object.values(state)){s.page=1;s.size=10;s.title='';s.pages=1;s.seq++;}state.task.done='all';overviewSeq++;editingId=null;for(const k of ['task','goal']){$(k+'Search').value='';$(k+'PageSize').value='10';empty(k+'List','等待加载…');$(k+'PageInfo').textContent='第 1 页';$(k+'Prev').disabled=true;$(k+'Next').disabled=true;}for(const b of document.querySelectorAll('[data-filter]'))b.classList.toggle('active',b.dataset.filter==='all');for(const id of ['ovTasks','ovDone','ovGoals','taskTotal','taskDoneCount','taskPendingCount','goalTotal','goalTarget','goalCompleted'])$(id).textContent='—';$('overviewStatus').textContent='';}
+function changeAuthMode(mode){authMode=mode;const register=mode==='register';$('loginTab').classList.toggle('active',!register);$('registerTab').classList.toggle('active',register);$('authTitle').textContent=register?'创建 StudyHub 账号':'登录学习工作台';$('ageField').hidden=!register;$('age').disabled=!register;$('password').autocomplete=register?'new-password':'current-password';$('authSubmit').textContent=register?'注册':'登录';notice('authNotice');}
+function endSession(message='',type='info'){epoch++;token='';localStorage.removeItem(KEY);for(const d of document.querySelectorAll('dialog[open]'))d.close();resetState();$('appPage').hidden=true;$('authPage').hidden=false;$('password').value='';changeAuthMode('login');notice('authNotice',message,type);}
+function showApp(){resetState();$('authPage').hidden=true;$('appPage').hidden=false;const c=claims();const name=typeof c.username==='string'?c.username:'已登录';$('headerUser').textContent=name;$('avatar').textContent=name.slice(0,1).toUpperCase();$('profileName').textContent=name;$('profileId').textContent=c.sub??'—';$('profileApi').textContent=location.origin;go('overview');}
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();const register=authMode==='register';const username=$('username').value.trim(),password=$('password').value;if(!username||!password){notice('authNotice','请输入用户名和密码。');return;}const btn=$('authSubmit');if(btn.disabled)return;const start=epoch;setBusy(btn,true,register?'注册中…':'登录中…');notice('authNotice');$('loginTab').disabled=$('registerTab').disabled=true;
+  try{const body={username,password};if(register && $('age').value!=='')body.age=Number($('age').value);const data=await apiRequest(register?API.register:API.login,{method:'POST',body,publicRequest:true});if(start!==epoch)return;if(register){changeAuthMode('login');$('password').value='';notice('authNotice','注册成功，请使用新账号登录。','success');}else{const jwt=typeof data==='string'?data:data?.token;if(typeof jwt!=='string'||!jwt.trim())throw new Error('登录接口没有返回 JWT。');epoch++;token=jwt;localStorage.setItem(KEY,token);$('password').value='';showApp();}}
+  catch(e){if(!isStale(e)&&start===epoch)notice('authNotice',errorMessage(e));}finally{setBusy(btn,false,authMode==='register'?'注册':'登录');$('loginTab').disabled=$('registerTab').disabled=false;}
+});
+$('loginTab').onclick=()=>changeAuthMode('login');$('registerTab').onclick=()=>changeAuthMode('register');$('logout').onclick=()=>endSession('已退出登录。','success');
+// 3. 路由和分页。兼容现有 PageBean 的 list/total，以及 records/total。
+function go(next){if(!token||!labels[next])return;view=next;notice('mainNotice');for(const k of Object.keys(labels))$('view-'+k).hidden=k!==next;for(const b of document.querySelectorAll('[data-view]')){b.classList.toggle('active',b.dataset.view===next);if(b.dataset.view===next)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}$('breadcrumb').textContent='工作台 / '+labels[next];if(next==='overview')loadOverview();if(next==='tasks')loadPage('task');if(next==='goals')loadPage('goal');}
+for(const b of document.querySelectorAll('[data-view],[data-goto]'))b.onclick=()=>go(b.dataset.view||b.dataset.goto);
+function pageData(data,size){if(Array.isArray(data))return {items:data,total:data.length,pages:1};const items=data?.list??data?.records??data?.items??data?.content??data?.tasks;const total=Number(data?.total);if(!Array.isArray(items)||!Number.isFinite(total)||total<0)throw new Error('分页响应格式不正确，需要 list（或 records）和 total。');return {items,total,pages:Math.max(1,Math.ceil(total/size))};}
+async function queryTasks(s){const params=new URLSearchParams({page:String(s.page),pageSize:String(s.size)});if(s.done!=='all')params.set('done',s.done);if(s.title)params.set('title',s.title);return pageData(await apiRequest(API.tasks+'?'+params),s.size);}
+async function queryGoals(s){const body={page:s.page,pageSize:s.size};if(s.title)body.title=s.title;return pageData(await apiRequest(API.goalPage,{method:'POST',body}),s.size);}
+async function loadOverview(){const seq=++overviewSeq,start=epoch;for(const id of ['ovTasks','ovDone','ovGoals'])$(id).textContent='—';$('overviewStatus').textContent='正在读取实际数据…';const base={page:1,size:1,title:''};const queries=[queryTasks({...base,done:'all'}),queryTasks({...base,done:'true'}),queryGoals(base)];const results=await Promise.allSettled(queries);if(seq!==overviewSeq||start!==epoch)return;const ids=['ovTasks','ovDone','ovGoals'];results.forEach((r,i)=>{if(r.status==='fulfilled')$(ids[i]).textContent=r.value.total;});const failed=results.filter(r=>r.status==='rejected');$('overviewStatus').textContent=failed.length?'部分数据加载失败：'+errorMessage(failed[0].reason):'';}
+$('refreshOverview').onclick=loadOverview;
+async function loadPage(kind){if(!token)return;const s=state[kind];const seq=++s.seq,start=epoch;const snapshot={...s};const active=()=>seq===s.seq&&start===epoch;$(kind+'Prev').disabled=true;$(kind+'Next').disabled=true;empty(kind+'List','正在加载…');for(const id of (kind==='task'?['taskTotal','taskDoneCount','taskPendingCount']:['goalTotal','goalTarget','goalCompleted']))$(id).textContent='—';try{const page=await (kind==='task'?queryTasks(snapshot):queryGoals(snapshot));if(!active())return;if(s.page>page.pages){s.page=page.pages;return loadPage(kind);}s.pages=page.pages;$(kind+'PageInfo').textContent=`第 ${s.page} / ${page.pages} 页 · 共 ${page.total} 条`;$(kind+'Prev').disabled=s.page<=1;$(kind+'Next').disabled=s.page>=page.pages;if(kind==='task')renderTasks(page);else renderGoals(page);}catch(e){if(!active()||isStale(e))return;empty(kind+'List',errorMessage(e));$(kind+'PageInfo').textContent='加载失败，请刷新重试';}}
+for(const kind of ['task','goal']){const s=state[kind];$(kind+'SearchForm').onsubmit=e=>{e.preventDefault();s.title=$(kind+'Search').value.trim();s.page=1;notice('mainNotice');loadPage(kind);};$(kind+'PageSize').onchange=e=>{s.size=Number(e.target.value);s.page=1;loadPage(kind);};$(kind+'Prev').onclick=()=>{if(s.page>1){s.page--;loadPage(kind);}};$(kind+'Next').onclick=()=>{if(s.page<s.pages){s.page++;loadPage(kind);}};}
+$('refreshTasks').onclick=()=>loadPage('task');$('refreshGoals').onclick=()=>loadPage('goal');
+for(const b of document.querySelectorAll('[data-filter]'))b.onclick=()=>{state.task.done=b.dataset.filter;state.task.page=1;for(const x of document.querySelectorAll('[data-filter]'))x.classList.toggle('active',x===b);loadPage('task');};
+// 4. 列表渲染：用户输入始终通过 textContent 写入页面，不拼接 HTML。
+const doneValue=v=>v===true||v===1||v==='1'||v==='true';
+function formatTime(v){return v?String(v).replace('T',' ').slice(0,19):'—';}
+function button(text,cls,handler){const b=element('button','btn '+cls,text);b.type='button';b.onclick=handler;return b;}
+function renderTasks(page){const list=$('taskList');list.replaceChildren();const done=page.items.filter(t=>doneValue(t.done)).length;$('taskTotal').textContent=page.total;$('taskDoneCount').textContent=done;$('taskPendingCount').textContent=page.items.length-done;if(!page.items.length){empty('taskList','暂无符合条件的任务。试试其他筛选条件，或创建一个新任务。');return;}
+  for(const task of page.items){const isDone=doneValue(task.done),row=element('article','task'+(isDone?' done':''));const check=button(isDone?'✓':'○','',()=>toggleTask(task,check));check.className='check';check.setAttribute('aria-label',isDone?'标记为未完成':'标记为已完成');check.setAttribute('aria-pressed',String(isDone));const content=element('div','task-content');content.append(element('div','item-title',task.title??'未命名任务'),element('div','muted',`#${task.id} · 创建于 ${formatTime(task.createdAt??task.created_at)}`));const status=element('span','tag'+(isDone?' done':''),isDone?'已完成':'待完成');const actions=element('div','actions');actions.append(button('编辑','small secondary',()=>openTask(task)),button('删除','small danger',()=>deleteTask(task,actions)));row.append(check,content,status,actions);list.append(row);}}
+function renderGoals(page){const list=$('goalList');list.replaceChildren();$('goalTotal').textContent=page.total;$('goalTarget').textContent=page.items.reduce((sum,g)=>sum+num(g.targetMinutes),0);$('goalCompleted').textContent=page.items.reduce((sum,g)=>sum+num(g.completedMinutes),0);if(!page.items.length){empty('goalList','暂无符合条件的学习目标。点击右上角创建目标。');return;}
+  for(const goal of page.items){const target=num(goal.targetMinutes),completed=num(goal.completedMinutes),ratio=target>0?completed/target*100:0;const card=element('article','goal');const head=element('div','goal-head');const title=element('div');title.append(element('div','item-title',goal.title??'未命名目标'),element('div','muted',`目标 #${goal.id}`));head.append(title,element('span','tag'+(ratio>=100?' done':''),ratio>=100?'已达成':'进行中'));const progress=element('div','progress-label');progress.append(element('strong','',`${Math.round(ratio*10)/10}%`),element('span','',`${completed} / ${target} 分钟`));const track=element('div','progress-track');track.setAttribute('role','progressbar');track.setAttribute('aria-label','目标完成进度');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(Math.min(100,Math.max(0,ratio))));const fill=element('div','progress-fill');fill.style.width=Math.min(100,Math.max(0,ratio))+'%';track.append(fill);card.append(head,progress,track,element('div','muted meta',`创建于 ${formatTime(goal.createdAt)} · 更新于 ${formatTime(goal.updatedAt)}`));list.append(card);}}
+// 5. 任务新增、编辑、状态切换、删除。
+function openTask(task=null){if($('taskSave').disabled)return;editingId=task?.id??null;$('taskDialogTitle').textContent=task?'编辑任务':'新建任务';$('taskTitle').value=task?.title??'';$('taskDoneField').hidden=!task;$('taskDone').value=String(doneValue(task?.done));notice('taskDialogNotice');$('taskDialog').showModal();$('taskTitle').focus();}
+$('newTask').onclick=()=>openTask();
+$('taskForm').onsubmit=async e=>{e.preventDefault();const title=$('taskTitle').value.trim();if(!title||title.length>200){notice('taskDialogNotice','请输入 1–200 个字符的任务标题。');return;}const id=editingId,editing=id!==null,btn=$('taskSave'),start=epoch;if(btn.disabled)return;setBusy(btn,true,'保存中…');notice('taskDialogNotice');try{const body=editing?{title,done:$('taskDone').value==='true'}:{title};await apiRequest(editing?API.tasks+'/'+encodeURIComponent(id):API.tasks,{method:editing?'PUT':'POST',body});if(start!==epoch)return;$('taskDialog').close();if(!editing){state.task.page=1;state.task.done='all';state.task.title='';$('taskSearch').value='';for(const x of document.querySelectorAll('[data-filter]'))x.classList.toggle('active',x.dataset.filter==='all');}notice('mainNotice',editing?'任务修改成功。':'任务创建成功。','success');await loadPage('task');}catch(e){if(!isStale(e)&&start===epoch)notice('taskDialogNotice',errorMessage(e));}finally{setBusy(btn,false,'保存任务');}};
+async function toggleTask(task,btn){if(btn.disabled)return;btn.disabled=true;const start=epoch;try{await apiRequest(API.tasks+'/'+encodeURIComponent(task.id),{method:'PUT',body:{title:task.title,done:!doneValue(task.done)}});if(start!==epoch)return;notice('mainNotice','任务状态已更新。','success');await loadPage('task');}catch(e){if(!isStale(e)&&start===epoch)notice('mainNotice',errorMessage(e));}finally{btn.disabled=false;}}
+async function deleteTask(task,actions){if(!confirm(`确定删除任务「${task.title}」？此操作不可撤销。`))return;const start=epoch;for(const b of actions.querySelectorAll('button'))b.disabled=true;try{await apiRequest(API.tasks+'/'+encodeURIComponent(task.id),{method:'DELETE'});if(start!==epoch)return;notice('mainNotice','任务删除成功。','success');await loadPage('task');}catch(e){if(!isStale(e)&&start===epoch)notice('mainNotice',errorMessage(e));}finally{for(const b of actions.querySelectorAll('button'))b.disabled=false;}}
+// 6. 学习目标：目前后端只支持创建和查询，不提供假编辑或假删除按钮。
+$('newGoal').onclick=()=>{if($('goalSave').disabled)return;$('goalForm').reset();notice('goalDialogNotice');$('goalDialog').showModal();$('goalTitle').focus();};
+$('goalForm').onsubmit=async e=>{e.preventDefault();const title=$('goalTitle').value.trim(),targetMinutes=Number($('goalMinutes').value);if(!title||title.length>200||!Number.isInteger(targetMinutes)||targetMinutes<1||targetMinutes>2147483647){notice('goalDialogNotice','标题不能为空，时长必须为有效的正整数（分钟）。');return;}const btn=$('goalSave'),start=epoch;if(btn.disabled)return;setBusy(btn,true,'创建中…');notice('goalDialogNotice');try{const id=await apiRequest(API.goals,{method:'POST',body:{title,targetMinutes}});if(start!==epoch)return;$('goalDialog').close();state.goal.page=1;state.goal.title='';$('goalSearch').value='';notice('mainNotice',`目标创建成功${id==null?'':'，目标 ID：'+id}。`,'success');await loadPage('goal');}catch(e){if(!isStale(e)&&start===epoch)notice('goalDialogNotice',errorMessage(e));}finally{setBusy(btn,false,'创建目标');}};
+for(const b of document.querySelectorAll('[data-close]'))b.onclick=()=>{const dialog=$(b.dataset.close);if(!dialog.querySelector('button[type=submit]').disabled)dialog.close();};for(const d of document.querySelectorAll('dialog'))d.addEventListener('cancel',e=>{if(d.querySelector('button[type=submit]').disabled)e.preventDefault();});
+// 7. 页面初始化。公开首页由 SecurityConfig 放行，其余业务仍由服务器授权。
+changeAuthMode('login');if(token)showApp();
 </script>
 </body>
 </html>
